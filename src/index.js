@@ -1,3 +1,5 @@
+import api from "./services/api";
+
 class TaskList {
   constructor() {
     this.titleInput = document.getElementById("messageTitle");
@@ -9,12 +11,17 @@ class TaskList {
     this.btnSaveEdit = document.getElementById("saveEdit");
 
     this.scraps = [];
-
+    this.getScraps();
     this.setAddButtonEvent();
+
+    
   }
 
-  generateScrapId() {
-    return this.scraps.length + 1;
+  async getScraps() {
+    const { data } = await api.get("/scraps");
+    
+    this.scraps = data;
+    this.renderScraps();
   }
 
   setAddButtonEvent() {
@@ -48,14 +55,17 @@ class TaskList {
     this.setButtonEvents();
   }
 
-  addNewScrap() {
-    let title = this.titleInput.value;
-    let message = this.messageInput.value;
+  async addNewScrap() {
+    let newTitle = this.titleInput.value;
+    let newMessage = this.messageInput.value;
 
     this.titleInput.value = "";
     this.messageInput.value = "";
 
-    const id = this.generateScrapId();
+    const {data} = await api.post("/scraps", {
+      title: newTitle, 
+      message: newMessage
+    });
 
     this.scraps.push({ id, title, message });
 
